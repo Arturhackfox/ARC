@@ -1,0 +1,56 @@
+// Retain cycle class - trailing closure
+
+class Person {
+    var closure: () -> () = { }
+    
+    init() {
+        print("Object has been created.")
+    }
+    deinit {
+        print("Object DEINITED.")
+    }
+}
+
+// [capture list] - captures COPY of value
+// since person stores Pointer to Person() object
+// we capture strong [person] copy and creating strong second pointer
+// to solve create [weak person] pointer so it doesn't count by ARC
+
+do {
+    print("Creating Object..")
+    let person = Person()
+    person.closure = { [weak person] in
+        print("Instance is = \(person!)")
+    }
+    person.closure()
+}
+
+// class - closure Retain cycle example through func
+class Pet {
+    var name: String
+    var closure: () -> () = { }
+    
+    init(name: String) {
+        self.name = name
+    }
+    
+    deinit {
+        print("Deinited")
+    }
+    // Функция ссылаеться на класс через self. что создаст stron ссылку на класс
+    func teachClosureToSayName() {
+        closure = { [weak self] in
+            print(self?.name)
+        }
+    }
+}
+
+
+do {
+    let pet = Pet(name: "Vinston")
+    pet.closure
+    pet.teachClosureToSayName()
+}
+
+
+
