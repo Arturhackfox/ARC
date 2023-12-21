@@ -20,7 +20,7 @@ do {
     print("Creating Object..")
     let person = Person()
     person.closure = { [weak person] in
-        print("Instance is = \(person!)")
+        print("Instance is = \(person!)") // print accepts value as copy, so it creates strong refernce by default
     }
     person.closure()
 }
@@ -52,5 +52,32 @@ do {
     pet.teachClosureToSayName()
 }
 
+// EXPLANATION WITH FUNC THAT CREATES CLOSURE , THAT CAPTURES VALUE self
+class Person {
+    var name: String = "Flert"
+    var closure: () -> () = { }
+    
+    func setClosure() {
+        closure = { [self] in      // захватил так же если trailing closure [person]
+            print("\(self.name)")  // self я обращаюсь к созданому экземпляру
+        }
+    }
+    
+    deinit {
+        print("Person deinited!")
+    }
+}
 
 
+var person: Person? = Person()
+person?.setClosure()
+
+person = nil
+
+// IT DOESNT DEINIT 
+// NEED [weak self] to create weak reference inside closure that captures instance of Person
+
+
+1. The setClosure method is called.
+2. Inside setClosure, a closure is created, and it captures self (the instance of the Person class) strongly by default.
+3. The closure is assigned to the closure property of the Person instance.
